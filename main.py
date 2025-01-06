@@ -1,10 +1,13 @@
 import os
 import zipfile
+import datetime
 
 
-def compress_files(input_paths, outfile="test6.zip"):
+def compress_files(input_paths, output_zip_name):
     try:
-        with zipfile.ZipFile(outfile, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+        with zipfile.ZipFile(
+            output_zip_name, mode="w", compression=zipfile.ZIP_DEFLATED
+        ) as zf:
             for path in input_paths:
                 if not os.path.exists(path):
                     print(f"Path does not exist: {path}")
@@ -25,11 +28,13 @@ def compress_files(input_paths, outfile="test6.zip"):
 
                     arcname = os.path.join(base_folder, os.path.basename(path))
                     zf.write(path, arcname=arcname)
-
-        print(f"Files successfully compressed into {outfile}")
+            # need to add logic to delete the files and folders after compressing
+        print(f"Files successfully compressed into {output_zip_name}")
     except Exception as e:
         print(f"Error in compressing files: {e}")
 
 
 input_paths = ["/Users/prem/Desktop", "/Users/prem/Downloads"]
-compress_files(input_paths)
+current_date = datetime.datetime.now().strftime("%d-%m-%Y")
+output_zip_name = f"backup_{current_date}.zip"
+compress_files(input_paths, output_zip_name)
