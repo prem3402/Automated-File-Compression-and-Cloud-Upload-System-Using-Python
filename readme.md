@@ -31,15 +31,16 @@
 </ol>
 <hr>
 <h2>Setup</h2>
-### Step 1: Clone the Repository
-``` bash
+ <h3> Step 1: Clone the Repository</h3>
+
 https://github.com/prem3402/Automated-File-Compression-and-Cloud-Upload-System-Using-Python.git
+
 cd Automated-File-Compression-and-Cloud-Upload-System-Using-Python
-```
+
 <h3>Step 2: Install the Dependencies</h3>
-```bash
+
 pip install -r requirements.txt
-```
+
 <h3>Step 3: Configure the Credentials</h3>
 <ol type="1">
 <li>Place your Google Drive API credentials (client_secrets.json) in the project directory.</li>
