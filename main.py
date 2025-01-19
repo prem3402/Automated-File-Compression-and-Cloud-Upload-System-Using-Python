@@ -3,6 +3,36 @@ import zipfile
 import datetime
 from smb.SMBConnection import SMBConnection
 import logging
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+
+
+def authenticate_google_drive():
+
+    creds = None
+
+    token_path = "token.json"
+    credentials_path = "client_secrets.json"
+
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(credentials_path, SCOPES)
+            creds = flow.run_local_server(port=0)
+
+        with open(token_path, "w") as token_file:
+            token_file.write(creds.to_json())
+
+    return build("drive", "v3", credentials=creds)
 
 
 def compress_files(input_paths, output_zip_name):
@@ -35,7 +65,7 @@ def compress_files(input_paths, output_zip_name):
 
         for path in input_paths:
             if os.path.isdir(path):
-                # Remove files inside the directory
+
                 for root, _, files in os.walk(path, topdown=False):
                     for file in files:
                         full_path = os.path.join(root, file)
@@ -108,26 +138,49 @@ def upload_to_windows_share(
         )
 
         conn.close()
-        os.remove(file_path)
+
     except Exception as e:
         logging.error(f"Error uploading {file_path} to {remote_host}: {e}")
+
+
+def upload_to_drive(file_path, folder_id=None):
+    logging.info(f"Uploading {file_path} to Google Drive")
+    service = authenticate_google_drive()
+    file_metadata = {"name": os.path.basename(file_path)}
+
+    if folder_id:
+        file_metadata["parents"] = [folder_id]
+
+    media = MediaFileUpload(file_path, resumable=True)
+
+    file = (
+        service.files()
+        .create(body=file_metadata, media_body=media, fields="id")
+        .execute()
+    )
+
+    print(f"File uploaded successfully! File ID: {file.get('id')}")
+    os.remove(file_path)
 
 
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
-    input_paths = ["/Users/prem/Desktop", "/Users/prem/Downloads"]
+    input_paths = [
+        "/Users/prem/Desktop",
+        "/Users/prem/Downloads",
+    ]  # Replace with your input paths
     current_date = datetime.datetime.now().strftime("%d-%m-%Y")
     output_zip_name = f"backup_{current_date}.zip"
     file_to_upload = f"backup_{current_date}.zip"
 
-    user_name = "premachars96@gmail.com"
-    user_password = "Premkumar593402!"
+    user_name = "YOUR_WINDOWS_COMPUTER_USERNAME"
+    user_password = "YOUR_WINDOWS_COMPUTER_PASSWORD"
 
-    remote_computer = "192.168.0.143"
+    remote_computer = "YOUR_WINDOWS_COMPUTER_IP"
     shared_folder = "d"
-    destination_path = "macbook/backup"
-    host_machine_name = "Desktop-vboln0f"
+    destination_path = "YOUR_DESTINATION_PATH"
+    host_machine_name = "YOUR_DESTINATION_MACHINE_NAME"
 
     compress_files(input_paths, output_zip_name)
 
@@ -140,3 +193,6 @@ if __name__ == "__main__":
         user_password,
         host_machine_name,
     )
+
+    folder_id = None
+    upload_to_drive(file_to_upload, folder_id)
