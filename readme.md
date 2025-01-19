@@ -33,7 +33,7 @@
 <h2>Setup</h2>
  <h3> Step 1: Clone the Repository</h3>
 
-https://github.com/prem3402/Automated-File-Compression-and-Cloud-Upload-System-Using-Python.git
+git clone https://github.com/prem3402/Automated-File-Compression-and-Cloud-Upload-System-Using-Python.git
 
 cd Automated-File-Compression-and-Cloud-Upload-System-Using-Python
 
