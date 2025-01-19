@@ -31,8 +31,8 @@
 </ol>
 <hr>
 <h2>Setup</h2>
-<h3>Step 1: Clone the Repository</h3>
-```bash
+### Step 1: Clone the Repository
+``` bash
 https://github.com/prem3402/Automated-File-Compression-and-Cloud-Upload-System-Using-Python.git
 cd Automated-File-Compression-and-Cloud-Upload-System-Using-Python
 ```
